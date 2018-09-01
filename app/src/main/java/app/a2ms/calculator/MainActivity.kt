@@ -16,7 +16,7 @@ class MainActivity : AppCompatActivity() {
     //    Variable to hold the operands and type of calculation
     private var operand1: Double? = null
     private var operand2: Double = 0.0
-    private var pendindOperaton = "="
+    private var pendingOperation = "="
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,8 +66,8 @@ class MainActivity : AppCompatActivity() {
             if (value.isNotEmpty()) {
                 performOperation(value, op)
             }
-            pendindOperaton = op
-            displayOperation.text = pendindOperaton
+            pendingOperation = op
+            displayOperation.text = pendingOperation
         }
         buttonEquals.setOnClickListener(opListener)
         buttonMinus.setOnClickListener(opListener)
@@ -76,7 +76,27 @@ class MainActivity : AppCompatActivity() {
         buttonPlus.setOnClickListener(opListener)
     }
 
-    private fun performOperation(value: String, operatio: String) {
-        displayOperation.text
+    private fun performOperation(value: String, operation: String) {
+        if (operand1 == null) {
+            operand1 = value.toDouble()
+        } else {
+            operand2 = value.toDouble()
+            if (pendingOperation == "=") {
+                pendingOperation = operation
+            }
+            when (pendingOperation) {
+                "=" -> operand1 = operand2
+                "/" -> if (operand2 == 0.0) {
+                    operand1 = Double.NaN //Handle attempt to divide by zero
+                } else {
+                    operand1 = operand1!! / operand2
+                }
+                "*" -> operand1 = operand1!! * operand2  //!! bang bang operation ☺
+                "-" -> operand1 = operand1!! - operand2
+                "+" -> operand1 = operand1!! + operand2
+            }
+        }
+        result.setText(operand1.toString())
+        newNumber.setText("")
     }
 }
