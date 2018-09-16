@@ -6,17 +6,7 @@ import android.view.View
 import android.widget.Button
 import kotlinx.android.synthetic.main.activity_main.*
 
-//value nd key for screen configuration change
-private const val STATE_PENDING_OPERATION = "PendingOperation"
-private const val STATE_OPERAND1 = "Operand1"
-private const val STATE_OPERAND1_STORED = "Operand1_Stored"
-
 class MainActivity : AppCompatActivity() {
-
-
-    //    Variable to hold the operands and type of calculation
-    private var operand1: Double? = null
-    private var pendingOperation = "="
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,6 +41,7 @@ class MainActivity : AppCompatActivity() {
             pendingOperation = op
             operation.text = pendingOperation
         }
+
         buttonEquals.setOnClickListener(opListener)
         buttonMinus.setOnClickListener(opListener)
         buttonMultiply.setOnClickListener(opListener)
@@ -72,49 +63,9 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-    }
-
-    private fun performOperation(value: Double, operation: String) {
-        if (operand1 == null) {
-            operand1 = value
-        } else {
-            if (pendingOperation == "=") {
-                pendingOperation = operation
-            }
-            when (pendingOperation) {
-                "=" -> operand1 = value
-                "/" -> operand1 = if (value == 0.0) {
-                    Double.NaN //Handle attempt to divide by zero
-                } else {
-                    operand1!! / value
-                }
-                "*" -> operand1 = operand1!! * value  //!! bang bang operation ☺
-                "-" -> operand1 = operand1!! - value
-                "+" -> operand1 = operand1!! + value
-            }
+        buttonClear.setOnClickListener {
+            newNumber.text.clear()
+            result.text = null
         }
-        result.setText(operand1.toString()) //not a good idea to display number as string for internationalisation
-        newNumber.setText("")
-    }
-
-    override fun onSaveInstanceState(outState: Bundle?) {
-        super.onSaveInstanceState(outState)
-        if (operand1 != null) {
-            outState?.putDouble(STATE_OPERAND1, operand1!!)
-            outState?.putBoolean(STATE_OPERAND1_STORED, true)
-        }
-        outState?.putString(STATE_PENDING_OPERATION, pendingOperation)
-    }
-
-    //Parameter change to non nullable
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        super.onRestoreInstanceState(savedInstanceState)
-        operand1 = if (savedInstanceState.getBoolean(STATE_OPERAND1_STORED, false)) {
-            savedInstanceState.getDouble(STATE_OPERAND1)
-        } else {
-            null
-        }
-        pendingOperation = savedInstanceState.getString(STATE_PENDING_OPERATION)
-        operation.text = pendingOperation
     }
 }
