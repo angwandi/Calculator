@@ -16,9 +16,9 @@ class MainActivity : AppCompatActivity() {
 
         val viewModel = ViewModelProviders.of(this).get(CalculatorViewModel::class.java)
         //Setting observer
-        viewModel.result.observe(this, Observer<String> { stringResult -> result.setText(stringResult) })
-        viewModel.newNumber.observe(this, Observer<String> { stringNumber -> newNumber.setText(stringNumber) })
-        viewModel.operation.observe(this, Observer<String> { stringOperation -> operation.text = stringOperation })
+        viewModel.stringResult.observe(this, Observer<String> { stringResult -> result.setText(stringResult) })
+        viewModel.stringNewNumber.observe(this, Observer<String> { stringNumber -> newNumber.setText(stringNumber) })
+        viewModel.stringOperation.observe(this, Observer<String> { stringOperation -> operation.text = stringOperation })
 
         val listener = View.OnClickListener { v ->
             viewModel.digitPressed((v as Button).text.toString())
