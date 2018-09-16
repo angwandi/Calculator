@@ -12,6 +12,46 @@ class CalculatorViewModel : ViewModel() {
 
     val result = MutableLiveData<String>()
     val newNumber = MutableLiveData<String>()
+    val operation = MutableLiveData<String>()
+
+    fun digitPressed(caption: String) {
+        if (newNumber.value != null) {
+            newNumber.value = newNumber.value + caption
+        } else {
+            newNumber.value = caption
+        }
+    }
+
+    fun operandPressed(op: String) {
+        try {
+            val value = newNumber.value?.toDouble()
+            if (value != null) {
+                performOperation(value, op)
+            }
+        } catch (e: NumberFormatException) {
+            newNumber.value = ""
+            pendingOperation = op
+            operation.value = pendingOperation
+        }
+        pendingOperation = op
+        operation.value = pendingOperation
+    }
+
+    fun negPressed() {
+        val value = newNumber.value
+        if (value == null || value.isEmpty()) {
+            newNumber.value = "-"
+        } else {
+            try {
+                var doubleValue = value.toDouble()
+                doubleValue *= -1
+                newNumber.value = doubleValue.toString()
+            } catch (e: NumberFormatException) {
+                //newNumber was "-" or ".", so clear it
+                newNumber.value = ""
+            }
+        }
+    }
 
     private fun performOperation(value: Double, operation: String) {
         if (operand1 == null) {

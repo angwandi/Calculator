@@ -1,5 +1,7 @@
 package app.a2ms.calculator
 
+import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.View
@@ -12,9 +14,14 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        val viewModel = ViewModelProviders.of(this).get(CalculatorViewModel::class.java)
+        //Setting observer
+        viewModel.result.observe(this, Observer<String> { stringResult -> result.setText(stringResult) })
+        viewModel.newNumber.observe(this, Observer<String> { stringNumber -> newNumber.setText(stringNumber) })
+        viewModel.operation.observe(this, Observer<String> { stringOperation -> operation.text = stringOperation })
+
         val listener = View.OnClickListener { v ->
-            val b = v as Button
-            newNumber.append(b.text)
+            viewModel.digitPressed((v as Button).text.toString())
         }
         button0.setOnClickListener(listener)
         button1.setOnClickListener(listener)
@@ -29,17 +36,7 @@ class MainActivity : AppCompatActivity() {
         buttonDot.setOnClickListener(listener)
 
         val opListener = View.OnClickListener { v ->
-            val op = (v as Button).text.toString()
-            try {
-                val value = newNumber.text.toString().toDouble()
-                performOperation(value, op)
-            } catch (e: NumberFormatException) {
-                newNumber.setText("")
-                pendingOperation = op
-                operation.text = pendingOperation
-            }
-            pendingOperation = op
-            operation.text = pendingOperation
+            viewModel.operandPressed((v as Button).text.toString())
         }
 
         buttonEquals.setOnClickListener(opListener)
@@ -49,23 +46,7 @@ class MainActivity : AppCompatActivity() {
         buttonPlus.setOnClickListener(opListener)
 
         buttonNeg.setOnClickListener {
-            val value = newNumber.text.toString()
-            if (value.isEmpty()) {
-                newNumber.setText("-")
-            } else {
-                try {
-                    var doubleValue = value.toDouble()
-                    doubleValue *= -1
-                    newNumber.setText(doubleValue.toString())
-                } catch (e: NumberFormatException) {
-                    //newNumber was "-" or ".", so clear it
-                    newNumber.setText("")
-                }
-            }
-        }
-        buttonClear.setOnClickListener {
-            newNumber.text.clear()
-            result.text = null
+            viewModel.negPressed()
         }
     }
 }
